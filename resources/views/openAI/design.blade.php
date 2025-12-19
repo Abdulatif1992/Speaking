@@ -77,6 +77,65 @@
       min-height:110px;
       resize: vertical;
     }
+
+    /* Result card: umumiy dizaynga mos, lekin ajralib turadi */
+    .result-card{
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      opacity:.20;
+      pointer-events:none;
+      background: radial-gradient(600px 200px at 20% 0%, rgba(255,255,255,.18), transparent 55%);
+    }
+
+    .result-ok{ box-shadow:0 18px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(34,197,94,.35) inset; }
+    .result-bad{ box-shadow:0 18px 50px rgba(0,0,0,0.35), 0 0 0 1px rgba(239,68,68,.35) inset; }
+
+    .result-badge-ok{
+      background: rgba(34,197,94,.14);
+      border: 1px solid rgba(34,197,94,.45);
+      color: rgba(220,252,231,.95);
+    }
+    .result-badge-bad{
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.45);
+      color: rgba(254,226,226,.95);
+    }
+
+    .result-grade{
+      font-size: 46px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    /* loading */
+    .result-badge-loading{
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.18);
+      color: rgba(255,255,255,.75);
+    }
+
+    .spinner{
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.25);
+      border-top-color: rgba(255,255,255,.85);
+      display: inline-block;
+      vertical-align: -2px;
+      margin-right: 8px;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin{
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 
@@ -84,8 +143,7 @@
 
   <div class="container py-4">
     <div class="row justify-content-center">
-      <div class="col-12 col-lg-9">
-
+      <div class="col-12 col-lg-8 col-xl-9">
         <div class="glass-card bg-dark bg-opacity-75 p-3 p-md-4"">
 
           <!-- Top header -->
@@ -96,7 +154,7 @@
                   <i class="bi bi-lightning-charge me-1"></i> Question
                 </span>
                 <span class="badge rounded-pill text-bg-light bg-opacity-10 border border-light border-opacity-10 text-white-50 px-3 py-2">
-                  <i class="bi bi-clock-history me-1"></i> 1/10
+                  <i class="bi bi-clock-history me-1"></i> 1
                 </span>                
               </div>
 
@@ -116,7 +174,7 @@
               <div class="p-3 rounded-4 bg-black bg-opacity-25 border border-light border-opacity-10 mb-3">
                 <div class="fw-semibold small text-white-50 mb-1">Question</div>
                 <div class="lh-lg">
-                  あなたの名前は何ですか？
+                  {{ $data['question'] }}
                 </div>
               </div>
             </div>
@@ -155,7 +213,7 @@
               @csrf
               <label class="form-label small text-white-50 mb-2">Your answer</label>
 
-              <input type="hidden" name="question" value="あなたの名前は何ですか？">
+              <input type="hidden" name="question" value="{{ $data['question'] }}">
 
               <textarea id="answerInput" name="answer"
                 class="form-control answer-input text-white"
@@ -169,17 +227,85 @@
                   </button>
                 </div>
 
-                <button type="submit" id="submit"
+                <button type="button" id="submit"
                   class="btn btn-success fw-bold rounded-4 px-4 py-2 shadow">
                   <i class="bi bi-send-fill me-2"></i> Send
                 </button>
               </div>
             </form>
           </div>
-
         </div>
+        <br>
+
+        <button type="button" id="next" class="btn btn-primary fw-bold rounded-4 px-4 py-2 shadow">
+          <i class="bi bi-send-fill me-2"></i> Next
+        </button>
 
       </div>
+
+      
+
+      <!-- O'ng: kichik sidebar -->
+      <div class="col-12 col-lg-4 col-xl-3">
+        <div class="glass-card bg-dark bg-opacity-75 p-3 p-md-3">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="fw-semibold">exellent answers</div>
+          </div>
+
+          <div class="p-2 rounded-4 bg-black bg-opacity-25 border border-light border-opacity-10 mb-3">
+            @if(!empty($data['answers']['10_point']))
+              <ol class="mb-0 ps-3 small">
+                @foreach($data['answers']['10_point'] as $ans)
+                  <li class="text-white-50">{{ $ans }}</li>
+                @endforeach
+              </ol>
+            @else
+              <div class="small text-white-50">Javoblar topilmadi</div>
+            @endif
+          </div>
+
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="fw-semibold">good answers</div>
+          </div>
+
+          <div class="p-2 rounded-4 bg-black bg-opacity-25 border border-light border-opacity-10">
+            @if(!empty($data['answers']['5_point']))
+              <ol class="mb-0 ps-3 small">
+                @foreach($data['answers']['5_point'] as $ans)
+                  <li class="text-white-50">{{ $ans }}</li>
+                @endforeach
+              </ol>
+            @else
+              <div class="small text-white-50">Javoblar topilmadi</div>
+            @endif
+          </div>
+        </div>
+
+        <!--result-->
+        <div id="resultCard" class="glass-card p-3 p-md-3 mt-3 d-none result-card">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="fw-semibold">Result</div>
+            <span id="resultBadge" class="badge rounded-pill">—</span>
+          </div>
+
+          <div class="d-flex align-items-end justify-content-between gap-3">
+            <div>
+              <div class="small text-white-50">Grade</div>
+              <div id="resultGrade" class="result-grade">--</div>
+            </div>
+
+            <div class="text-end">
+              <div class="small text-white-50">Status</div>
+              <div id="resultStatus" class="fw-semibold">—</div>
+              <div class="small text-white-50">Threshold: 7.0</div>
+            </div>
+          </div>
+        </div>
+
+
+
+      </div>
+      
     </div>
   </div>
 
@@ -195,6 +321,7 @@
         const answerInput = document.getElementById('answerInput');
         const eraser = document.getElementById('eraser');
         const submitBtn = document.getElementById('submit');
+        const nextBtn = document.getElementById('next');
         const form = document.getElementById('qaScoreForm');
 
         // Web Speech API
@@ -282,24 +409,124 @@
             };
         }
 
-        // submitBtn.addEventListener('click', function () {
-        //   console.log("clicked")
-        //     if (answerInput.value.trim() !== '') {
-        //         $.ajax({
-        //             url: form.action,
-        //             type: "POST",
-        //             data: $(form).serialize(),
-        //             dataType: "json",
-        //             success: function (response) {
-        //                 console.log("success", response);
-        //             },
-        //             error: function (xhr) {
-        //                 console.log("error", xhr.responseText);
-        //             }
-        //         });
+        submitBtn.addEventListener('click', function () {
+            stopBtn.click();
 
-        //     }
-        // });
+            const answer = answerInput.value.trim();
+            if (answer === '') return;
+            // UX: yuborish vaqtida tugmani o'chirish
+            submitBtn.disabled = true;
+            renderLoading();
+
+            if (answerInput.value.trim() !== '') {
+                $.ajax({
+                    url: form.action,
+                    type: "POST",
+                    data: $(form).serialize(),
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        // response: { ok: true, grade: 8.4, is_correct: true }
+                        if (!response || response.ok !== true) {
+                            renderResult(null, false, "Failed");
+                            return;
+                        }
+
+                        const grade = Number(response.grade);
+                        const isCorrect = Boolean(response.is_correct);
+
+                        renderResult(grade, isCorrect);
+                    },
+                    error: function (xhr) {
+                        console.log("error", xhr.responseText);
+
+                        // 422 validation error bo'lishi mumkin
+                        renderResult(null, false, "Error");
+                    },
+                    complete: function () {
+                        submitBtn.disabled = false;
+                    }
+                });
+
+            }
+        });
+
+        nextBtn.addEventListener('click', function () {
+            window.location.href = "{{ route('question2') }}";  
+        });
+
+        function renderLoading() {
+            const resultCard = document.getElementById('resultCard');
+            const resultGrade = document.getElementById('resultGrade');
+            const resultStatus = document.getElementById('resultStatus');
+            const resultBadge = document.getElementById('resultBadge');
+
+            // ko'rsatish
+            resultCard.classList.remove('d-none');
+
+            // avvalgi holatlarni tozalash
+            resultCard.classList.remove('result-ok', 'result-bad');
+            resultBadge.classList.remove('result-badge-ok', 'result-badge-bad');
+            resultBadge.classList.add('result-badge-loading');
+
+            // loading matnlar
+            resultGrade.textContent = '...';
+            resultStatus.textContent = 'Checking';
+
+            // spinner + badge
+            resultBadge.innerHTML = '<span class="spinner"></span>Checking...';
+
+            // xohlasangiz scroll
+            resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function renderResult(grade, isCorrect, badgeTextOverride = null) {
+            const resultCard = document.getElementById('resultCard');
+            const resultGrade = document.getElementById('resultGrade');
+            const resultStatus = document.getElementById('resultStatus');
+            const resultBadge = document.getElementById('resultBadge');
+
+            resultCard.classList.remove('d-none');
+
+            // loading classini ham tozalaymiz
+            resultBadge.classList.remove('result-badge-loading');
+
+            // oldingi holat classlarini tozalash
+            resultCard.classList.remove('result-ok', 'result-bad');
+            resultBadge.classList.remove('result-badge-ok', 'result-badge-bad');
+
+            // grade
+            if (typeof grade === 'number' && Number.isFinite(grade)) {
+                resultGrade.textContent = grade.toFixed(1);
+            } else {
+                resultGrade.textContent = '--';
+            }
+
+            // status + badge
+            if (isCorrect) {
+                resultCard.classList.add('result-ok');
+                resultBadge.classList.add('result-badge-ok');
+                resultBadge.textContent = badgeTextOverride || 'Correct';
+                resultStatus.textContent = 'Passed';
+            } else {
+                resultCard.classList.add('result-bad');
+                resultBadge.classList.add('result-badge-bad');
+                resultBadge.textContent = badgeTextOverride || 'Try again';
+                resultStatus.textContent = (badgeTextOverride === 'Error' || badgeTextOverride === 'Failed')
+                    ? 'Error'
+                    : 'Not passed';
+            }
+        }
+
+        function stopRecording() {
+            if (!recording) return;
+
+            recording = false;
+            recognition.stop();
+
+            micBtn.classList.remove('recording');
+            wave.classList.add('d-none');
+        }
 
 
     </script>

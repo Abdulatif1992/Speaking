@@ -42,6 +42,8 @@ Route::post('/score-qa', [QaScoreController::class, 'score']);
 Route::view('lovable', 'lovable/design1');
 
 // design from chatGPT
-Route::view('question2', 'openAI/design');
+Route::get('/question2', [OpenAIController::class, 'importExcel'])->name('question2');
 Route::post('/score-qa2', [OpenAIController::class, 'score'])->name('score.qa2');
+Route::get('/testbefore', [OpenAIController::class, 'testBefore'])->name('testbefore');
+
 
