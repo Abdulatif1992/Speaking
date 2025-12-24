@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DBAndAIController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VoiceController;
 use App\Http\Controllers\QaScoreController;
@@ -44,6 +45,15 @@ Route::view('lovable', 'lovable/design1');
 // design from chatGPT
 Route::get('/question2', [OpenAIController::class, 'importExcel'])->name('question2');
 Route::post('/score-qa2', [OpenAIController::class, 'score'])->name('score.qa2');
-Route::get('/testbefore', [OpenAIController::class, 'testBefore'])->name('testbefore');
+// Route::get('/testbefore', [OpenAIController::class, 'testBefore'])->name('testbefore');
+
+Route::get('/question3', [OpenAIController::class, 'importExcel3'])->name('question3');
+Route::post('/score-qa3', [OpenAIController::class, 'scoreOnlyAI'])->name('score.qa3');
+// Route::get('/testbefore3', [OpenAIController::class, 'fullPredictOpenAI'])->name('fullPredictOpenAI');
+
+// First from DB and AI
+Route::get('/question4', [DBAndAIController::class, 'importExcel'])->name('question4');
+Route::post('/score-qa4', [DBAndAIController::class, 'score'])->name('score.qa4');
+Route::get('/testbefore4', [DBAndAIController::class, 'score'])->name('testbefore4');
 
 
