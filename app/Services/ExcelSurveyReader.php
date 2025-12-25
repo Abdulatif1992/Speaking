@@ -21,8 +21,10 @@ class ExcelSurveyReader
         $spreadsheet = $reader->load($filePath);
 
         $sheet = $spreadsheet->getSheetByName($sheetName);
+   
         if (!$sheet) {
             $available = array_map(fn($s) => $s->getTitle(), $spreadsheet->getAllSheets());
+            
             throw new RuntimeException("Sheet topilmadi: {$sheetName}. Mavjud: " . implode(', ', $available));
         }
 
@@ -66,6 +68,7 @@ class ExcelSurveyReader
                 'answers' => [
                     '10_point' => $answers10,
                     '5_point'  => $answers5,
+                    "all_"=> array_merge($answers10, $answers5)
                 ],
             ];
         }

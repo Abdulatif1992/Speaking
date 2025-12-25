@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DbKanjiAiController;
 use App\Http\Controllers\DBAndAIController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\VoiceController;
@@ -54,6 +55,10 @@ Route::post('/score-qa3', [OpenAIController::class, 'scoreOnlyAI'])->name('score
 // First from DB and AI
 Route::get('/question4', [DBAndAIController::class, 'importExcel'])->name('question4');
 Route::post('/score-qa4', [DBAndAIController::class, 'score'])->name('score.qa4');
-Route::get('/testbefore4', [DBAndAIController::class, 'score'])->name('testbefore4');
 
+// First from DB and kani then AI
+Route::get('/question5', [DbKanjiAiController::class, 'importExcel'])->name('question5');
+Route::post('/score-qa5', [DbKanjiAiController::class, 'score'])->name('score.qa5');
+
+Route::get('/question6', [DbKanjiAiController::class, 'importExcel2'])->name('question6');
 
